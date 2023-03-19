@@ -1,0 +1,115 @@
+#!/bin/bash
+
+#Make sure you "gcloud auth login" prior to running this script
+
+#Enables Org Policy API on the project you're using to query the constraint
+gcloud services enable orgpolicy.googleapis.com
+
+#Maps project ID to variable
+PROJ_ID=$(gcloud config get-value core/project)
+
+#Constraint list current as of March 18, 2023
+CONSTRAINTS='appengine.disableCodeDownload
+bigquery.disableBQOmniAWS
+bigquery.disableBQOmniAzure
+cloudbuild.allowedIntegrations
+cloudbuild.allowedWorkerPools
+clouddeploy.disableServiceLabelGeneration
+cloudfunctions.allowedIngressSettings
+cloudfunctions.allowedVpcConnectorEgressSettings
+cloudfunctions.requireVPCConnector
+cloudkms.allowedProtectionLevels
+cloudscheduler.allowedTargetTypes
+commerceorggovernance.disablePublicMarketplace
+commerceorggovernance.marketplaceServices
+compute.allowedVlanAttachmentEncryption
+compute.disableAllIpv6
+compute.disableGlobalCloudArmorPolicy
+compute.disableGlobalLoadBalancing
+compute.disableGlobalSelfManagedSslCertificate
+compute.disableGlobalSerialPortAccess
+compute.disableGuestAttributesAccess
+compute.disableHybridCloudIpv6
+compute.disableInstanceDataAccessApis
+compute.disableInternetNetworkEndpointGroup
+compute.disableNestedVirtualization
+compute.disableNonFIPSMachineTypes
+compute.disablePrivateServiceConnectCreationForConsumers
+compute.disableSerialPortAccess
+compute.disableSerialPortLogging
+compute.disableSshInBrowser
+compute.disableVpcExternalIpv6
+compute.disableVpcInternalIpv6
+compute.enableComplianceMemoryProtection
+compute.requireOsLogin
+compute.requireShieldedVm
+compute.requireVpcFlowLogs
+compute.restrictCloudNATUsage
+compute.restrictDedicatedInterconnectUsage
+compute.restrictLoadBalancerCreationForTypes
+compute.restrictNonConfidentialComputing
+compute.restrictPartnerInterconnectUsage
+compute.restrictProtocolForwardingCreationForTypes
+compute.restrictSharedVpcBackendServices
+compute.restrictSharedVpcHostProjects
+compute.restrictSharedVpcSubnetworks
+compute.restrictVpcPeering
+compute.restrictVpnPeerIPs
+compute.restrictXpnProjectLienRemoval
+compute.setNewProjectDefaultToZonalDNSOnly
+compute.sharedReservationsOwnerProjects
+compute.skipDefaultNetworkCreation
+compute.storageResourceUseRestrictions
+compute.trustedImageProjects
+compute.vmCanIpForward
+compute.vmExternalIpAccess
+container.restrictNoncompliantDiagnosticDataAccess
+datastream.disablePublicConnectivity
+essentialcontacts.allowedContactDomains
+essentialcontacts.disableProjectSecurityContacts
+firestore.requireP4SAforImportExport
+gcp.detailedAuditLoggingMode
+gcp.disableCloudLogging
+gcp.resourceLocations
+gcp.restrictCmekCryptoKeyProjects
+gcp.restrictNonCmekServices
+gcp.restrictServiceUsage
+gcp.restrictTLSVersion
+iam.allowedPolicyMemberDomains
+iam.allowServiceAccountCredentialLifetimeExtension
+iam.automaticIamGrantsForDefaultServiceAccounts
+iam.disableAuditLoggingExemption
+iam.disableCrossProjectServiceAccountUsage
+iam.disableServiceAccountCreation
+iam.disableServiceAccountKeyCreation
+iam.disableServiceAccountKeyUpload
+iam.disableWorkloadIdentityClusterCreation
+iam.restrictCrossProjectServiceAccountLienRemoval
+iam.serviceAccountKeyExpiryHours
+iam.workloadIdentityPoolAwsAccounts
+iam.workloadIdentityPoolProviders
+iap.requireGlobalIapWebDisabled
+iap.requireRegionalIapWebDisabled
+meshconfig.allowedVpcscModes
+resourcemanager.allowedExportDestinations
+resourcemanager.allowedImportSources
+resourcemanager.allowEnabledServicesForExport
+run.allowedBinaryAuthorizationPolicies
+run.allowedIngress
+run.allowedVPCEgress
+serviceuser.services
+sql.restrictAuthorizedNetworks
+sql.restrictNoncompliantDiagnosticDataAccess
+sql.restrictNoncompliantResourceCreation
+sql.restrictPublicIp
+storage.publicAccessPrevention
+storage.restrictAuthTypes
+storage.retentionPolicySeconds
+storage.uniformBucketLevelAccess'
+
+for CONSTRAINT in $CONSTRAINTS
+do
+RESULT=$(gcloud org-policies describe $CONSTRAINT --project=$PROJ_ID --effective)
+echo -e $RESULT\\n >> results.csv 
+done
+echo "COMPLETED! Check 'results.csv' for your results."
